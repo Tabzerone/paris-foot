@@ -7,10 +7,13 @@
 .m{color:var(--mut);font-size:13px}.v{border-left:4px solid var(--ac)}.w2{border-left:4px solid var(--bad)}
 .t{font-size:13px;margin-top:4px}pre{white-space:pre-wrap;font-size:11px;overflow-x:auto}
 summary{font-weight:600;padding:8px 0}
-</style></head><body><div class='w'><h1>âš½ Paris Foot</h1><div class='m'>Mis Ã  jour le 11/10/2026 Ã  16:00 UTC</div><h2>Ã‰carts avec le marchÃ© (0)</h2><div class='m'>Un bookmaker affiche une cote plus haute que la cote juste du marchÃ©. VÃ©rifie chez TON bookmaker : ne parie que si sa cote â‰¥ cote juste Ã— 1,03.</div><div class='c'>Aucun Ã©cart pour l'instant. Ne pas parier est une dÃ©cision valable.</div><h2>Tous les matchs (0)</h2><div class='c'>Aucun match trouvÃ© (trÃªve internationale ?).</div><p class='m'>Aucune mÃ©thode ne garantit de gagner. Ne joue que ce que tu peux perdre.</p><details><summary>Labo : sÃ©ries et Ã©carts marchÃ©</summary><pre>A) PLUS DE 2,5 BUTS APRÃˆS UNE SÃ‰RIE SANS MARQUER (option B)
-   [intervalle Ã  95% : si 0 est dedans, rien de prouvÃ©]
+</style></head><body><div class='w'><h1>⚽ Paris Foot</h1><div class='m'>Mis à jour le 11/10/2026 à 16:22 UTC</div><h2>Écarts avec le marché (0)</h2><div class='m'>Un bookmaker affiche une cote plus haute que la cote juste du marché. Vérifie chez TON bookmaker : ne parie que si sa cote ≥ cote juste × 1,03.</div><div class='c'>Aucun écart pour l'instant. Ne pas parier est une décision valable.</div><h2>Tous les matchs (0)</h2><div class='c'>Aucun match trouvé (trêve internationale ?).</div><p class='m'>Aucune méthode ne garantit de gagner. Ne joue que ce que tu peux perdre.</p><details><summary>Diagnostic</summary><pre>historique jusqu&#x27;au 20/09/2026 (10984 matchs)
+fixtures.csv : 199 lignes
+0 matchs dans les 5 championnats
+0 matchs analysés (historique suffisant)</pre></details><details><summary>Labo : séries et écarts marché</summary><pre>A) PLUS DE 2,5 BUTS APRÈS UNE SÉRIE SANS MARQUER (option B)
+   [intervalle à 95% : si 0 est dedans, rien de prouvé]
 
-SÃ©rie &gt;= 3 : n=  434 ROI   +8.4%  [-1% ; +18%]
+Série &gt;= 3 : n=  434 ROI   +8.4%  [-1% ; +18%]
    saisons 21-24: n=  254 ROI  +11.7%  [-1% ; +24%]
    saisons 24-26: n=  171 ROI   +3.2%  [-12% ; +18%]
    Allemagne  : n=   53 ROI   +0.2%  [-23% ; +24%]
@@ -18,7 +21,7 @@ SÃ©rie &gt;= 3 : n=  434 ROI   +8.4%  [-1% ; +18%]
    France     : n=   80 ROI   -2.1%  [-23% ; +19%]
    Italie     : n=  113 ROI  +11.3%  [-7% ; +30%]
    Espagne    : n=   96 ROI  +19.0%  [-4% ; +42%]
-SÃ©rie &gt;= 4 : n=  133 ROI   +6.4%  [-11% ; +24%]
+Série &gt;= 4 : n=  133 ROI   +6.4%  [-11% ; +24%]
    saisons 21-24: n=   72 ROI  +13.5%  [-10% ; +37%]
    saisons 24-26: n=   59 ROI   -1.6%  [-27% ; +24%]
    Allemagne  : n=   13 ROI   -5.4%  [-56% ; +45%]
@@ -27,58 +30,58 @@ SÃ©rie &gt;= 4 : n=  133 ROI   +6.4%  [-11% ; +24%]
    Italie     : n=   32 ROI  +18.5%  [-19% ; +56%]
    Espagne    : n=   29 ROI   +5.2%  [-36% ; +46%]
 
-B) Ã‰CART AVEC LE MARCHÃ‰ : cote max d&#x27;un bookmaker vs cote juste du marchÃ©
-   (cote juste = cotes moyennes de clÃ´ture sans marge ; diagnostic, pas pari rÃ©el)
+B) ÉCART AVEC LE MARCHÉ : cote max d&#x27;un bookmaker vs cote juste du marché
+   (cote juste = cotes moyennes de clôture sans marge ; diagnostic, pas pari réel)
 
-Tout parier Ã  la cote MAX      : n=45785 ROI   -2.1%  [-3% ; -1%]
-Tout parier Ã  la cote MOYENNE  : n=45785 ROI   -6.2%  [-7% ; -5%]
+Tout parier à la cote MAX      : n=45785 ROI   -2.1%  [-3% ; -1%]
+Tout parier à la cote MOYENNE  : n=45785 ROI   -6.2%  [-7% ; -5%]
 
-Ã‰cart &gt;= 2% :
-   Ã  la cote max     : n=13935 ROI   +4.8%  [+2% ; +8%]
-   Ã  la cote moyenne : n=13935 ROI   -0.6%  [-3% ; +2%]   &lt;- ce que tu obtiendrais chez un bookmaker ordinaire
+Écart &gt;= 2% :
+   à la cote max     : n=13935 ROI   +4.8%  [+2% ; +8%]
+   à la cote moyenne : n=13935 ROI   -0.6%  [-3% ; +2%]   &lt;- ce que tu obtiendrais chez un bookmaker ordinaire
 
-Ã‰cart &gt;= 5% :
-   Ã  la cote max     : n= 7522 ROI   +5.8%  [+2% ; +10%]
-   Ã  la cote moyenne : n= 7522 ROI   -0.4%  [-4% ; +4%]   &lt;- ce que tu obtiendrais chez un bookmaker ordinaire
+Écart &gt;= 5% :
+   à la cote max     : n= 7522 ROI   +5.8%  [+2% ; +10%]
+   à la cote moyenne : n= 7522 ROI   -0.4%  [-4% ; +4%]   &lt;- ce que tu obtiendrais chez un bookmaker ordinaire
 
-Ã‰cart &gt;= 8% :
-   Ã  la cote max     : n= 4047 ROI   +3.3%  [-3% ; +10%]
-   Ã  la cote moyenne : n= 4047 ROI   -3.7%  [-10% ; +2%]   &lt;- ce que tu obtiendrais chez un bookmaker ordinaire
+Écart &gt;= 8% :
+   à la cote max     : n= 4047 ROI   +3.3%  [-3% ; +10%]
+   à la cote moyenne : n= 4047 ROI   -3.7%  [-10% ; +2%]   &lt;- ce que tu obtiendrais chez un bookmaker ordinaire
 
-Ã‰cart &gt;= 3%, saisons 24-26 seulement (cote max) : n= 3672 ROI   +3.3%  [-2% ; +9%]
+Écart &gt;= 3%, saisons 24-26 seulement (cote max) : n= 3672 ROI   +3.3%  [-2% ; +9%]
 
 Lecture : seul un ROI positif ET dont l&#x27;intervalle exclut 0 compte.
-</pre></details><details><summary>Backtest du modÃ¨le de Poisson</summary><pre>Chargement des donnÃ©esâ€¦
-9158 matchs analysÃ©s (06/08/2021 â†’ 20/09/2026)
+</pre></details><details><summary>Backtest du modèle de Poisson</summary><pre>Chargement des données…
+9158 matchs analysés (06/08/2021 → 20/09/2026)
 
 ============================================================
-1) STRATÃ‰GIE SÃ‰RIES : une Ã©quipe n&#x27;a pas marquÃ© depuis N matchs
+1) STRATÉGIE SÉRIES : une équipe n&#x27;a pas marqué depuis N matchs
 ============================================================
-Base : une Ã©quipe marque dans 74.1% des matchs
+Base : une équipe marque dans 74.1% des matchs
 
- N | Ã©q. concernÃ©es | marque ensuite | matchs | BTTS | Over2.5 | ROI Over2.5 | ROI Under2.5
+ N | éq. concernées | marque ensuite | matchs | BTTS | Over2.5 | ROI Over2.5 | ROI Under2.5
  2 |           1357 |          67.7% |   1298 |  53% |    54%  |       +2.2% |      -12.4%
  3 |            440 |          68.9% |    434 |  56% |    56%  |       +8.4% |      -17.1%
  4 |            134 |          73.9% |    133 |  59% |    54%  |       +6.4% |      -13.5%
  5 |             34 |          67.6% |     33 |  48% |    45%  |      -12.9% |       +7.5%
  6 |             11 |          63.6% |     11 |  45% |    45%  |      -23.5% |      +10.4%
 
-â†’ Si Â« marque ensuite Â» reste proche de la base et que les ROI sont nÃ©gatifs,
-  la sÃ©rie ne donne aucun avantage : les cotes la contiennent dÃ©jÃ .
+→ Si « marque ensuite » reste proche de la base et que les ROI sont négatifs,
+  la série ne donne aucun avantage : les cotes la contiennent déjà.
 
 ============================================================
-2) MODÃˆLE DE POISSON : paris Ã  valeur (cotes moyennes rÃ©elles)
+2) MODÈLE DE POISSON : paris à valeur (cotes moyennes réelles)
 ============================================================
-RÃ©fÃ©rence (parier sur tout, cote â‰¤ 4.0) : ROI -4.8% sur 37150 paris  â† c&#x27;est la marge du bookmaker
+Référence (parier sur tout, cote ≤ 4.0) : ROI -4.8% sur 37150 paris  ← c&#x27;est la marge du bookmaker
 
- Avantage min | paris | % gagnÃ©s | ROI mise fixe
+ Avantage min | paris | % gagnés | ROI mise fixe
       0%      | 13406 |   44.0%  | -6.5%
       3%      | 11572 |   43.6%  | -6.8%
       5%      | 10447 |   43.2%  | -6.9%
      10%      |  7944 |   42.2%  | -7.3%
      15%      |  5923 |   40.4%  | -8.5%
 
-DÃ©tail par pari Ã  avantage â‰¥ 5% :
+Détail par pari à avantage ≥ 5% :
    1          2078 paris   ROI -11.1%
    2          2140 paris   ROI -5.3%
    N           568 paris   ROI -6.9%
@@ -86,11 +89,11 @@ DÃ©tail par pari Ã  avantage â‰¥ 5% :
    Under2.5   3112 paris   ROI -6.8%
 
 ============================================================
-3) SIMULATION : 10 â‚¬ de dÃ©part, mise 5% du capital
+3) SIMULATION : 10 € de départ, mise 5% du capital
 ============================================================
-10447 paris â†’ capital final 0.00 â‚¬   (pire baisse depuis un sommet : 100%)
+10447 paris → capital final 0.00 €   (pire baisse depuis un sommet : 100%)
 
-ATTENTION : mÃªme un ROI positif ici n&#x27;est pas une garantie. Les bookmakers
-limitent les comptes gagnants et les cotes rÃ©elles bougent. Valide d&#x27;abord
-en Â« paper trading Â» avec la commande predict.
+ATTENTION : même un ROI positif ici n&#x27;est pas une garantie. Les bookmakers
+limitent les comptes gagnants et les cotes réelles bougent. Valide d&#x27;abord
+en « paper trading » avec la commande predict.
 </pre></details></div></body></html>
