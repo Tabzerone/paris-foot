@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """
-Paris foot : backtest + modèle de Poisson + value bets
+Paris foot : backtest + modÃ¨le de Poisson + value bets
 5 championnats (Angleterre, Espagne, Italie, France, Allemagne)
 
 Installation :  pip install pandas numpy
 Usage :
-    python paris_foot.py backtest     -> teste les stratégies sur 5 saisons
-    python paris_foot.py predict      -> analyse les matchs à venir
-    python paris_foot.py site         -> génère la page web docs/index.html (pour GitHub)
-Options : --edge 0.05  (avantage minimum exigé, 0.05 = 5 %)
-          --maxodds 4  (cote maximale acceptée)
+    python paris_foot.py backtest     -> teste les stratÃ©gies sur 5 saisons
+    python paris_foot.py predict      -> analyse les matchs Ã  venir
+    python paris_foot.py labo         -> tests poussÃ©s (sÃ©ries + Ã©carts avec le marchÃ©)
+    python paris_foot.py site         -> gÃ©nÃ¨re la page web docs/index.html (pour GitHub)
+Options : --edge 0.05  (avantage minimum exigÃ©, 0.05 = 5 %)
+          --maxodds 4  (cote maximale acceptÃ©e)
 """
 import math
 import os
@@ -22,15 +23,15 @@ import pandas as pd
 
 LEAGUES = {"E0": "Angleterre", "SP1": "Espagne", "I1": "Italie",
            "D1": "Allemagne", "F1": "France"}
-WARMUP = "2021"                                   # saison de chauffe du modèle
-SEASONS = ["2122", "2223", "2324", "2425", "2526"]  # 5 saisons testées
+WARMUP = "2021"                                   # saison de chauffe du modÃ¨le
+SEASONS = ["2122", "2223", "2324", "2425", "2526"]  # 5 saisons testÃ©es
 CURRENT = "2627"                                  # saison en cours
 DATA = os.environ.get("PARIS_DATA", "data")
 BASE = "https://www.football-data.co.uk"
 START_BANK, STAKE_PCT = 10.0, 0.05
 
 
-# ----------------------------------------------------------------- données
+# ----------------------------------------------------------------- donnÃ©es
 def download(url, path):
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
@@ -58,6 +59,10 @@ def normalize(raw, season, league=None):
     d["oa"] = pick(raw, "AvgA", "B365A")
     d["oo"] = pick(raw, "Avg>2.5", "B365>2.5")
     d["ou"] = pick(raw, "Avg<2.5", "B365<2.5")
+    d["mh"], d["md"], d["ma"] = pick(raw, "MaxH"), pick(raw, "MaxD"), pick(raw, "MaxA")
+    d["mo"], d["mu"] = pick(raw, "Max>2.5"), pick(raw, "Max<2.5")
+    d["ch"], d["cd"], d["ca"] = pick(raw, "AvgCH", "PSCH"), pick(raw, "AvgCD", "PSCD"), pick(raw, "AvgCA", "PSCA")
+    d["co"], d["cu"] = pick(raw, "AvgC>2.5", "PC>2.5"), pick(raw, "AvgC<2.5", "PC<2.5")
     return d.dropna(subset=["date", "home", "away"])
 
 
@@ -66,7 +71,7 @@ def load_history():
     for s in [WARMUP] + SEASONS + [CURRENT]:
         for lg in LEAGUES:
             path = f"{DATA}/{s}_{lg}.csv"
-            if not os.path.exists(path) or s == CURRENT:   # saison en cours : on rafraîchit
+            if not os.path.exists(path) or s == CURRENT:   # saison en cours : on rafraÃ®chit
                 try:
                     download(f"{BASE}/mmz4281/{s}/{lg}.csv", path)
                 except Exception as e:
@@ -77,11 +82,11 @@ def load_history():
             d = normalize(raw, s, lg).dropna(subset=["hg", "ag"])
             frames.append(d)
     if not frames:
-        sys.exit("Aucune donnée téléchargée : vérifie ta connexion internet.")
+        sys.exit("Aucune donnÃ©e tÃ©lÃ©chargÃ©e : vÃ©rifie ta connexion internet.")
     return pd.concat(frames).sort_values("date", kind="stable").reset_index(drop=True)
 
 
-# ------------------------------------------------------------------ modèle
+# ------------------------------------------------------------------ modÃ¨le
 def pois(lam, k):
     return math.exp(-lam) * lam ** k / math.factorial(k)
 
@@ -99,11 +104,11 @@ def markets(lh, la, n=10):
 
 
 class Model:
-    """Force d'attaque/défense sur les 12 derniers matchs, réduite vers la moyenne."""
+    """Force d'attaque/dÃ©fense sur les 12 derniers matchs, rÃ©duite vers la moyenne."""
 
     def __init__(self, k=12, shrink=4, min_games=5):
         self.hist = defaultdict(lambda: deque(maxlen=k))
-        self.streak = defaultdict(int)       # matchs d'affilée sans marquer
+        self.streak = defaultdict(int)       # matchs d'affilÃ©e sans marquer
         self.lg = defaultdict(lambda: [0.0, 0.0, 0])
         self.shrink, self.min_games = shrink, min_games
 
@@ -139,7 +144,7 @@ class Model:
 
 
 def run_model(df):
-    """Passe chronologique : chaque prédiction n'utilise que le passé (pas de triche)."""
+    """Passe chronologique : chaque prÃ©diction n'utilise que le passÃ© (pas de triche)."""
     m = Model()
     keys = ["pH", "pD", "pA", "pO15", "pO25", "pO35", "pBTTS", "lh", "la"]
     cols = {k: [] for k in keys + ["sh", "sa"]}
@@ -163,25 +168,25 @@ def pct(x):
 
 
 def backtest(edge, maxodds):
-    print("Chargement des données…")
+    print("Chargement des donnÃ©esâ€¦")
     df = load_history()
     res, _ = run_model(df)
     d = res[res.season != WARMUP].copy()
-    print(f"{len(d)} matchs analysés ({d.date.min():%d/%m/%Y} → {d.date.max():%d/%m/%Y})\n")
+    print(f"{len(d)} matchs analysÃ©s ({d.date.min():%d/%m/%Y} â†’ {d.date.max():%d/%m/%Y})\n")
 
-    # ---- 1) Stratégie « séries sans marquer »
+    # ---- 1) StratÃ©gie Â« sÃ©ries sans marquer Â»
     print("=" * 60)
-    print("1) STRATÉGIE SÉRIES : une équipe n'a pas marqué depuis N matchs")
+    print("1) STRATÃ‰GIE SÃ‰RIES : une Ã©quipe n'a pas marquÃ© depuis N matchs")
     print("=" * 60)
     team_rows = pd.concat([
         pd.DataFrame({"s": d.sh, "scored": d.hg > 0}),
         pd.DataFrame({"s": d.sa, "scored": d.ag > 0})])
-    print(f"Base : une équipe marque dans {team_rows.scored.mean()*100:.1f}% des matchs\n")
+    print(f"Base : une Ã©quipe marque dans {team_rows.scored.mean()*100:.1f}% des matchs\n")
     d["tot"] = d.hg + d.ag
     d["ms"] = d[["sh", "sa"]].max(axis=1)
     d["o25"] = d.tot >= 3
     d["btts"] = (d.hg > 0) & (d.ag > 0)
-    print(" N | éq. concernées | marque ensuite | matchs | BTTS | Over2.5 | ROI Over2.5 | ROI Under2.5")
+    print(" N | Ã©q. concernÃ©es | marque ensuite | matchs | BTTS | Over2.5 | ROI Over2.5 | ROI Under2.5")
     for n in range(2, 7):
         t = team_rows[team_rows.s >= n]
         m = d[d.ms >= n]
@@ -190,12 +195,12 @@ def backtest(edge, maxodds):
         print(f" {n} | {len(t):14d} | {t.scored.mean()*100:13.1f}% | {len(m):6d} |"
               f" {m.btts.mean()*100:3.0f}% | {m.o25.mean()*100:5.0f}%  |"
               f" {pct(ov.mean()*100 if len(ov) else np.nan):>11} | {pct(un.mean()*100 if len(un) else np.nan):>11}")
-    print("\n→ Si « marque ensuite » reste proche de la base et que les ROI sont négatifs,"
-          "\n  la série ne donne aucun avantage : les cotes la contiennent déjà.\n")
+    print("\nâ†’ Si Â« marque ensuite Â» reste proche de la base et que les ROI sont nÃ©gatifs,"
+          "\n  la sÃ©rie ne donne aucun avantage : les cotes la contiennent dÃ©jÃ .\n")
 
-    # ---- 2) Value bets Poisson (cotes réelles)
+    # ---- 2) Value bets Poisson (cotes rÃ©elles)
     print("=" * 60)
-    print("2) MODÈLE DE POISSON : paris à valeur (cotes moyennes réelles)")
+    print("2) MODÃˆLE DE POISSON : paris Ã  valeur (cotes moyennes rÃ©elles)")
     print("=" * 60)
     sels = [("1", "pH", "oh", d.hg > d.ag), ("N", "pD", "od", d.hg == d.ag),
             ("2", "pA", "oa", d.hg < d.ag), ("Over2.5", "pO25", "oo", d.tot >= 3),
@@ -209,21 +214,21 @@ def backtest(edge, maxodds):
     bets["ev"] = bets.p * bets.odds - 1
     bets["profit"] = np.where(bets.win, bets.odds - 1, -1.0)
 
-    print(f"Référence (parier sur tout, cote ≤ {maxodds}) : ROI {pct(bets.profit.mean()*100)}"
-          f" sur {len(bets)} paris  ← c'est la marge du bookmaker\n")
-    print(" Avantage min | paris | % gagnés | ROI mise fixe")
+    print(f"RÃ©fÃ©rence (parier sur tout, cote â‰¤ {maxodds}) : ROI {pct(bets.profit.mean()*100)}"
+          f" sur {len(bets)} paris  â† c'est la marge du bookmaker\n")
+    print(" Avantage min | paris | % gagnÃ©s | ROI mise fixe")
     for th in [0.0, 0.03, 0.05, 0.10, 0.15]:
         b = bets[bets.ev >= th]
         if len(b):
             print(f"   {th*100:4.0f}%      | {len(b):5d} | {b.win.mean()*100:6.1f}%  | {pct(b.profit.mean()*100)}")
     b = bets[bets.ev >= edge]
-    print(f"\nDétail par pari à avantage ≥ {edge*100:.0f}% :")
+    print(f"\nDÃ©tail par pari Ã  avantage â‰¥ {edge*100:.0f}% :")
     for name, g in b.groupby("sel"):
         print(f"   {name:9s} {len(g):5d} paris   ROI {pct(g.profit.mean()*100)}")
 
     # ---- 3) Simulation de bankroll
     print("\n" + "=" * 60)
-    print(f"3) SIMULATION : {START_BANK:.0f} € de départ, mise {STAKE_PCT*100:.0f}% du capital")
+    print(f"3) SIMULATION : {START_BANK:.0f} â‚¬ de dÃ©part, mise {STAKE_PCT*100:.0f}% du capital")
     print("=" * 60)
     bk, peak, dd = START_BANK, START_BANK, 0.0
     for r in b.sort_values("date").itertuples():
@@ -231,15 +236,15 @@ def backtest(edge, maxodds):
         bk += stake * (r.odds - 1) if r.win else -stake
         peak = max(peak, bk)
         dd = max(dd, 1 - bk / peak)
-    print(f"{len(b)} paris → capital final {bk:.2f} €   (pire baisse depuis un sommet : {dd*100:.0f}%)")
-    print("\nATTENTION : même un ROI positif ici n'est pas une garantie. Les bookmakers"
-          "\nlimitent les comptes gagnants et les cotes réelles bougent. Valide d'abord"
-          "\nen « paper trading » avec la commande predict.")
+    print(f"{len(b)} paris â†’ capital final {bk:.2f} â‚¬   (pire baisse depuis un sommet : {dd*100:.0f}%)")
+    print("\nATTENTION : mÃªme un ROI positif ici n'est pas une garantie. Les bookmakers"
+          "\nlimitent les comptes gagnants et les cotes rÃ©elles bougent. Valide d'abord"
+          "\nen Â« paper trading Â» avec la commande predict.")
 
 
-# -------------------------------------------------------------- prédictions
+# -------------------------------------------------------------- prÃ©dictions
 def predict(edge, maxodds):
-    print("Chargement des données…")
+    print("Chargement des donnÃ©esâ€¦")
     df = load_history()
     _, m = run_model(df)
     path = f"{DATA}/fixtures.csv"
@@ -247,21 +252,21 @@ def predict(edge, maxodds):
         download(f"{BASE}/fixtures.csv", path)
     except Exception as e:
         if not os.path.exists(path):
-            sys.exit(f"Impossible de récupérer les matchs à venir : {e}")
+            sys.exit(f"Impossible de rÃ©cupÃ©rer les matchs Ã  venir : {e}")
     raw = pd.read_csv(path, encoding="latin-1", on_bad_lines="skip")
     fx = normalize(raw, CURRENT)
     fx = fx[fx.league.isin(LEAGUES)].sort_values("date")
     if fx.empty:
-        sys.exit("Aucun match à venir trouvé dans fixtures.csv.")
+        sys.exit("Aucun match Ã  venir trouvÃ© dans fixtures.csv.")
 
     picks = []
-    print(f"\n{len(fx)} matchs à venir.\n")
+    print(f"\n{len(fx)} matchs Ã  venir.\n")
     for r in fx.itertuples():
         p = m.predict(r.league, r.home, r.away)
         sh, sa = m.streak[(r.league, r.home)], m.streak[(r.league, r.away)]
         if not p:
             continue
-        flag = "  ⚠ SÉRIE" if max(sh, sa) >= 3 else ""
+        flag = "  âš  SÃ‰RIE" if max(sh, sa) >= 3 else ""
         print(f"{r.date:%d/%m} [{LEAGUES[r.league]}] {r.home} - {r.away}{flag}")
         print(f"   buts attendus {p['lh']:.2f}-{p['la']:.2f} | sans marquer : {sh}/{sa}")
         print(f"   1 {p['pH']*100:.0f}% N {p['pD']*100:.0f}% 2 {p['pA']*100:.0f}% | "
@@ -276,19 +281,77 @@ def predict(edge, maxodds):
                 picks.append((prob * odds - 1, f"{r.date:%d/%m} {r.home}-{r.away}", name, odds, prob))
 
     print("\n" + "=" * 60)
-    print(f"VALUE BETS (avantage ≥ {edge*100:.0f}%, cote ≤ {maxodds})")
+    print(f"VALUE BETS (avantage â‰¥ {edge*100:.0f}%, cote â‰¤ {maxodds})")
     print("=" * 60)
     if not picks:
-        print("Aucun pari à valeur aujourd'hui : ne pas parier est une décision valable.")
+        print("Aucun pari Ã  valeur aujourd'hui : ne pas parier est une dÃ©cision valable.")
     for ev, match, name, odds, prob in sorted(picks, reverse=True):
-        print(f"{match:35s} {name:9s} cote {odds:.2f}  proba modèle {prob*100:.0f}%  avantage {ev*100:+.0f}%")
-    print("\nPour +1.5, BTTS, DNB : compare la cote de ton bookmaker à la « cote juste »"
-          "\nci-dessus. Intéressant seulement si sa cote est nettement supérieure (≥ +5%)."
+        print(f"{match:35s} {name:9s} cote {odds:.2f}  proba modÃ¨le {prob*100:.0f}%  avantage {ev*100:+.0f}%")
+    print("\nPour +1.5, BTTS, DNB : compare la cote de ton bookmaker Ã  la Â« cote juste Â»"
+          "\nci-dessus. IntÃ©ressant seulement si sa cote est nettement supÃ©rieure (â‰¥ +5%)."
           "\nNote chaque pari fictif dans un tableur pendant quelques semaines avant de miser.")
 
 
+# ------------------------------------------------------------------- labo
+def ci(profit):
+    """ROI moyen avec intervalle de confiance Ã  95 %."""
+    p = pd.Series(profit, dtype=float)
+    n = len(p)
+    if n < 2:
+        return f"n={n}"
+    mu, se = p.mean(), p.std(ddof=1) / math.sqrt(n)
+    return f"n={n:5d} ROI {mu*100:+6.1f}%  [{(mu-1.96*se)*100:+.0f}% ; {(mu+1.96*se)*100:+.0f}%]"
+
+
+def labo(res):
+    d = res[res.season != WARMUP].copy()
+    d["tot"] = d.hg + d.ag
+    d["ms"] = d[["sh", "sa"]].max(axis=1)
+    print("A) PLUS DE 2,5 BUTS APRÃˆS UNE SÃ‰RIE SANS MARQUER (option B)")
+    print("   [intervalle Ã  95% : si 0 est dedans, rien de prouvÃ©]\n")
+    for n in (3, 4):
+        m = d[(d.ms >= n) & d.oo.notna()]
+        pr = np.where(m.tot >= 3, m.oo - 1, -1.0)
+        print(f"SÃ©rie >= {n} : {ci(pr)}")
+        for lab, g in (("saisons 21-24", m.season.isin(["2122", "2223", "2324"])),
+                       ("saisons 24-26", m.season.isin(["2425", "2526"]))):
+            print(f"   {lab}: {ci(pr[g.values])}")
+        for lg, g in m.groupby("league"):
+            print(f"   {LEAGUES[lg]:11s}: {ci(np.where(g.tot >= 3, g.oo - 1, -1.0))}")
+    print("\nB) Ã‰CART AVEC LE MARCHÃ‰ : cote max d'un bookmaker vs cote juste du marchÃ©")
+    print("   (cote juste = cotes moyennes de clÃ´ture sans marge ; diagnostic, pas pari rÃ©el)\n")
+    fr = []
+    for cols, sels in ((("ch", "cd", "ca"), [("1", "mh", "oh", d.hg > d.ag), ("N", "md", "od", d.hg == d.ag), ("2", "ma", "oa", d.hg < d.ag)]),
+                       (("co", "cu"), [("+2.5", "mo", "oo", d.tot >= 3), ("-2.5", "mu", "ou", d.tot <= 2)])):
+        q = [1 / d[c] for c in cols]
+        tot = sum(q)
+        for k, (name, mx, av, win) in enumerate(sels):
+            fr.append(pd.DataFrame({"sel": name, "p": q[k] / tot, "mx": d[mx], "av": d[av],
+                                    "win": win, "season": d.season}))
+    b = pd.concat(fr).dropna(subset=["p", "mx", "av"])
+    if b.empty:
+        print("Colonnes de cotes max/clÃ´ture absentes des fichiers : test impossible.")
+        return
+    b["ev"] = b.p * b.mx - 1
+    pm = np.where(b.win, b.mx - 1, -1.0)
+    pa = np.where(b.win, b.av - 1, -1.0)
+    print(f"Tout parier Ã  la cote MAX      : {ci(pm)}")
+    print(f"Tout parier Ã  la cote MOYENNE  : {ci(pa)}")
+    for th in (0.02, 0.05, 0.08):
+        g = (b.ev >= th).values
+        print(f"\nÃ‰cart >= {th*100:.0f}% :")
+        print(f"   Ã  la cote max     : {ci(pm[g])}")
+        print(f"   Ã  la cote moyenne : {ci(pa[g])}   <- ce que tu obtiendrais chez un bookmaker ordinaire")
+    g = (b.ev >= 0.03).values & b.season.isin(["2425", "2526"]).values
+    print(f"\nÃ‰cart >= 3%, saisons 24-26 seulement (cote max) : {ci(pm[g])}")
+    print("\nLecture : seul un ROI positif ET dont l'intervalle exclut 0 compte.")
+
+
 # --------------------------------------------------------------- page web
-def fixtures_rows(m, edge, maxodds):
+MKT_EDGE = 0.03
+
+
+def fixtures_rows(m, maxodds):
     path = f"{DATA}/fixtures.csv"
     try:
         download(f"{BASE}/fixtures.csv", path)
@@ -303,14 +366,23 @@ def fixtures_rows(m, edge, maxodds):
         p = m.predict(r.league, r.home, r.away)
         if not p:
             continue
-        picks = []
-        for name, prob, odds in [("1", p["pH"], r.oh), ("N", p["pD"], r.od), ("2", p["pA"], r.oa),
-                                 ("+2.5", p["pO25"], r.oo), ("-2.5", 1 - p["pO25"], r.ou)]:
-            if pd.notna(odds) and odds <= maxodds and prob * odds - 1 >= edge:
-                picks.append((prob * odds - 1, name, float(odds), prob))
+        mk = []
+        if pd.notna([r.oh, r.od, r.oa]).all():
+            q = [1 / r.oh, 1 / r.od, 1 / r.oa]
+            for nm, qi, mx in zip(("1", "N", "2"), q, (r.mh, r.md, r.ma)):
+                mk.append((nm, qi / sum(q), mx))
+        if pd.notna([r.oo, r.ou]).all():
+            q = [1 / r.oo, 1 / r.ou]
+            for nm, qi, mx in zip(("+2.5", "-2.5"), q, (r.mo, r.mu)):
+                mk.append((nm, qi / sum(q), mx))
+        fair, picks = {}, []
+        for nm, pf, mx in mk:
+            fair[nm] = 1 / pf
+            if pd.notna(mx) and mx <= maxodds and pf * mx - 1 >= MKT_EDGE:
+                picks.append((pf * mx - 1, nm, float(mx), 1 / pf))
         rows.append({"date": r.date, "lg": LEAGUES[r.league], "home": r.home, "away": r.away,
                      "sh": m.streak[(r.league, r.home)], "sa": m.streak[(r.league, r.away)],
-                     "p": p, "picks": sorted(picks, reverse=True)})
+                     "p": p, "fair": fair, "picks": sorted(picks, reverse=True)})
     return rows
 
 
@@ -326,45 +398,46 @@ summary{font-weight:600;padding:8px 0}
 """
 
 
-def build_html(rows, bt, edge):
-    from datetime import datetime
+def build_html(rows, bt, lab):
+    from datetime import datetime, timezone
     from html import escape as e
+    now = datetime.now(timezone.utc)
     out = ["<!DOCTYPE html><html lang='fr'><head><meta charset='utf-8'><title>Paris Foot</title>",
            "<meta name='viewport' content='width=device-width, initial-scale=1, viewport-fit=cover'>",
            f"<style>{CSS}</style></head><body><div class='w'>",
-           "<h1>⚽ Paris Foot</h1>",
-           f"<div class='m'>Mis à jour le {datetime.utcnow():%d/%m/%Y à %H:%M} UTC · "
-           f"avantage minimum {edge*100:.0f}% · mise = 5% du capital</div>"]
+           "<h1>âš½ Paris Foot</h1>",
+           f"<div class='m'>Mis Ã  jour le {now:%d/%m/%Y Ã  %H:%M} UTC</div>"]
     value = [(pk, r) for r in rows for pk in r["picks"][:1]]
     value.sort(key=lambda x: x[0][0], reverse=True)
-    out.append(f"<h2>Paris à valeur ({len(value)})</h2>")
+    out.append(f"<h2>Ã‰carts avec le marchÃ© ({len(value)})</h2>")
+    out.append("<div class='m'>Un bookmaker affiche une cote plus haute que la cote juste du marchÃ©. "
+               "VÃ©rifie chez TON bookmaker : ne parie que si sa cote â‰¥ cote juste Ã— 1,03.</div>")
     if not value:
-        out.append("<div class='c'>Aucun pari à valeur pour l'instant. Ne pas parier est une décision valable.</div>")
-    for (ev, name, odds, prob), r in value:
-        cls = "w2" if ev > 0.20 else "v"
-        note = " · ⚠ trop beau pour être vrai, vérifie blessures/forme" if ev > 0.20 else ""
+        out.append("<div class='c'>Aucun Ã©cart pour l'instant. Ne pas parier est une dÃ©cision valable.</div>")
+    for (ev, name, odds, fair), r in value:
+        cls = "w2" if ev > 0.12 else "v"
+        note = " Â· âš  Ã©cart Ã©norme : cote probablement erronÃ©e ou pÃ©rimÃ©e" if ev > 0.12 else ""
         out.append(f"<div class='c {cls}'><b>{e(r['home'])} - {e(r['away'])}</b>"
-                   f"<div class='m'>{r['date']:%d/%m} · {r['lg']}</div>"
-                   f"<div>Pari <b>{name}</b> à la cote <b>{odds:.2f}</b> · proba {prob*100:.0f}% · "
-                   f"avantage <b>{ev*100:+.0f}%</b>{note}</div></div>")
+                   f"<div class='m'>{r['date']:%d/%m} Â· {r['lg']}</div>"
+                   f"<div>Pari <b>{name}</b> Â· cote max <b>{odds:.2f}</b> vs cote juste <b>{fair:.2f}</b> Â· "
+                   f"Ã©cart <b>{ev*100:+.0f}%</b>{note}</div></div>")
     out.append(f"<h2>Tous les matchs ({len(rows)})</h2>")
     for r in rows:
         p = r["p"]
-        flag = " ⚠ série" if max(r["sh"], r["sa"]) >= 3 else ""
+        flag = " âš  sÃ©rie" if max(r["sh"], r["sa"]) >= 3 else ""
+        fairs = " Â· ".join(f"{k} {v:.2f}" for k, v in r["fair"].items()) or "n/d"
         dnb1, dnb2 = (p["pH"] + p["pA"]) / p["pH"], (p["pH"] + p["pA"]) / p["pA"]
         out.append(
             f"<div class='c'><b>{e(r['home'])} - {e(r['away'])}</b>{flag}"
-            f"<div class='m'>{r['date']:%d/%m} · {r['lg']} · buts attendus {p['lh']:.1f}-{p['la']:.1f} · "
-            f"sans marquer {r['sh']}/{r['sa']}</div>"
-            f"<div class='t'>1 {p['pH']*100:.0f}% · N {p['pD']*100:.0f}% · 2 {p['pA']*100:.0f}%</div>"
-            f"<div class='t'><b>Cotes justes</b> : +1.5 {1/p['pO15']:.2f} · +2.5 {1/p['pO25']:.2f} · "
-            f"-2.5 {1/(1-p['pO25']):.2f} · +3.5 {1/p['pO35']:.2f} · BTTS {1/p['pBTTS']:.2f} · "
-            f"DNB dom {dnb1:.2f} · DNB ext {dnb2:.2f}</div></div>")
+            f"<div class='m'>{r['date']:%d/%m} Â· {r['lg']} Â· sans marquer {r['sh']}/{r['sa']}</div>"
+            f"<div class='t'><b>Cotes justes du marchÃ©</b> : {fairs}</div>"
+            f"<div class='t m'>ModÃ¨le maison (indicatif, non rentable au backtest) : +1.5 {1/p['pO15']:.2f} Â· "
+            f"+3.5 {1/p['pO35']:.2f} Â· BTTS {1/p['pBTTS']:.2f} Â· DNB dom {dnb1:.2f} Â· DNB ext {dnb2:.2f}</div></div>")
     if not rows:
-        out.append("<div class='c'>Aucun match trouvé (trêve internationale ?).</div>")
-    out.append("<p class='m'>Parie seulement si la cote de ton bookmaker dépasse la cote juste d'au moins 5%. "
-               "Aucune méthode ne garantit de gagner.</p>")
-    out.append(f"<details><summary>Résultat du backtest (5 saisons)</summary><pre>{e(bt)}</pre></details>")
+        out.append("<div class='c'>Aucun match trouvÃ© (trÃªve internationale ?).</div>")
+    out.append("<p class='m'>Aucune mÃ©thode ne garantit de gagner. Ne joue que ce que tu peux perdre.</p>")
+    out.append(f"<details><summary>Labo : sÃ©ries et Ã©carts marchÃ©</summary><pre>{e(lab)}</pre></details>")
+    out.append(f"<details><summary>Backtest du modÃ¨le de Poisson</summary><pre>{e(bt)}</pre></details>")
     out.append("</div></body></html>")
     return "".join(out)
 
@@ -377,12 +450,15 @@ def site(edge, maxodds):
         backtest(edge, maxodds)
     bt = buf.getvalue()
     df = load_history()
-    _, m = run_model(df)
-    rows = fixtures_rows(m, edge, maxodds)
+    res, m = run_model(df)
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        labo(res)
+    rows = fixtures_rows(m, maxodds)
     os.makedirs("docs", exist_ok=True)
     with open("docs/index.html", "w", encoding="utf-8") as f:
-        f.write(build_html(rows, bt, edge))
-    print(f"docs/index.html généré ({len(rows)} matchs).")
+        f.write(build_html(rows, bt, buf.getvalue()))
+    print(f"docs/index.html gÃ©nÃ©rÃ© ({len(rows)} matchs).")
 
 
 if __name__ == "__main__":
@@ -393,6 +469,8 @@ if __name__ == "__main__":
         backtest(edge, maxodds)
     elif args and args[0] == "predict":
         predict(edge, maxodds)
+    elif args and args[0] == "labo":
+        labo(run_model(load_history())[0])
     elif args and args[0] == "site":
         site(edge, maxodds)
     else:
