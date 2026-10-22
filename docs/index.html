@@ -7,7 +7,7 @@
 .m{color:var(--mut);font-size:13px}.v{border-left:4px solid var(--ac)}.w2{border-left:4px solid var(--bad)}
 .t{font-size:13px;margin-top:4px}pre{white-space:pre-wrap;font-size:11px;overflow-x:auto}
 summary{font-weight:600;padding:8px 0}
-</style></head><body><div class='w'><h1>⚽ Paris Foot</h1><div class='m'>Mis à jour le 21/10/2026 à 06:34 UTC</div><h2>Écarts avec le marché (0)</h2><div class='m'>Un bookmaker affiche une cote plus haute que la cote juste du marché. Vérifie chez TON bookmaker : ne parie que si sa cote ≥ cote juste × 1,03.</div><div class='c'>Aucun écart pour l'instant. Ne pas parier est une décision valable.</div><h2>Tous les matchs (1)</h2><div class='c'><b>Levante - Ath Bilbao</b><div class='m'>21/10 · Espagne · sans marquer 0/2</div><div class='t'><b>Cotes justes du marché</b> : 1 3.63 · N 3.49 · 2 2.28 · +2.5 2.04 · -2.5 1.96</div><div class='t m'>Modèle maison (indicatif, non rentable au backtest) : +1.5 1.20 · +3.5 2.44 · BTTS 1.58 · DNB dom 1.56 · DNB ext 2.79</div></div><p class='m'>Aucune méthode ne garantit de gagner. Ne joue que ce que tu peux perdre.</p><details><summary>Diagnostic</summary><pre>historique jusqu&#x27;au 19/10/2026 (11079 matchs)
+</style></head><body><div class='w'><h1>⚽ Paris Foot</h1><div class='m'>Mis à jour le 22/10/2026 à 06:34 UTC</div><h2>Écarts avec le marché (0)</h2><div class='m'>Un bookmaker affiche une cote plus haute que la cote juste du marché. Vérifie chez TON bookmaker : ne parie que si sa cote ≥ cote juste × 1,03.</div><div class='c'>Aucun écart pour l'instant. Ne pas parier est une décision valable.</div><h2>Tous les matchs (1)</h2><div class='c'><b>Levante - Ath Bilbao</b><div class='m'>21/10 · Espagne · sans marquer 0/0</div><div class='t'><b>Cotes justes du marché</b> : 1 3.63 · N 3.49 · 2 2.28 · +2.5 2.04 · -2.5 1.96</div><div class='t m'>Modèle maison (indicatif, non rentable au backtest) : +1.5 1.23 · +3.5 2.69 · BTTS 1.73 · DNB dom 1.36 · DNB ext 3.75</div></div><p class='m'>Aucune méthode ne garantit de gagner. Ne joue que ce que tu peux perdre.</p><details><summary>Diagnostic</summary><pre>historique jusqu&#x27;au 21/10/2026 (11080 matchs)
 fixtures.csv : 27 lignes, 94 colonnes
 championnats présents : E2:12, E3:12, E1:1, SC1:1, SP1:1
 dates : 20/10/2026 -&gt; 21/10/2026
@@ -35,16 +35,16 @@ Série &gt;= 4 : n=  133 ROI   +6.4%  [-11% ; +24%]
 B) ÉCART AVEC LE MARCHÉ : cote max d&#x27;un bookmaker vs cote juste du marché
    (cote juste = cotes moyennes de clôture sans marge ; diagnostic, pas pari réel)
 
-Tout parier à la cote MAX      : n=46260 ROI   -2.1%  [-3% ; -1%]
-Tout parier à la cote MOYENNE  : n=46260 ROI   -6.2%  [-7% ; -5%]
+Tout parier à la cote MAX      : n=46265 ROI   -2.1%  [-3% ; -1%]
+Tout parier à la cote MOYENNE  : n=46265 ROI   -6.2%  [-7% ; -5%]
 
 Écart &gt;= 2% :
-   à la cote max     : n=14044 ROI   +4.6%  [+2% ; +7%]
-   à la cote moyenne : n=14044 ROI   -0.8%  [-3% ; +2%]   &lt;- ce que tu obtiendrais chez un bookmaker ordinaire
+   à la cote max     : n=14045 ROI   +4.7%  [+2% ; +7%]
+   à la cote moyenne : n=14045 ROI   -0.7%  [-3% ; +2%]   &lt;- ce que tu obtiendrais chez un bookmaker ordinaire
 
 Écart &gt;= 5% :
-   à la cote max     : n= 7576 ROI   +5.5%  [+1% ; +10%]
-   à la cote moyenne : n= 7576 ROI   -0.7%  [-5% ; +3%]   &lt;- ce que tu obtiendrais chez un bookmaker ordinaire
+   à la cote max     : n= 7577 ROI   +5.5%  [+1% ; +10%]
+   à la cote moyenne : n= 7577 ROI   -0.7%  [-5% ; +3%]   &lt;- ce que tu obtiendrais chez un bookmaker ordinaire
 
 Écart &gt;= 8% :
    à la cote max     : n= 4081 ROI   +2.9%  [-3% ; +9%]
@@ -54,7 +54,7 @@ Tout parier à la cote MOYENNE  : n=46260 ROI   -6.2%  [-7% ; -5%]
 
 Lecture : seul un ROI positif ET dont l&#x27;intervalle exclut 0 compte.
 </pre></details><details><summary>Backtest du modèle de Poisson</summary><pre>Chargement des données…
-9253 matchs analysés (06/08/2021 → 19/10/2026)
+9254 matchs analysés (06/08/2021 → 21/10/2026)
 
 ============================================================
 1) STRATÉGIE SÉRIES : une équipe n&#x27;a pas marqué depuis N matchs
@@ -62,7 +62,7 @@ Lecture : seul un ROI positif ET dont l&#x27;intervalle exclut 0 compte.
 Base : une équipe marque dans 74.2% des matchs
 
  N | éq. concernées | marque ensuite | matchs | BTTS | Over2.5 | ROI Over2.5 | ROI Under2.5
- 2 |           1362 |          67.8% |   1303 |  53% |    54%  |       +2.3% |      -12.5%
+ 2 |           1363 |          67.8% |   1304 |  53% |    54%  |       +2.4% |      -12.6%
  3 |            441 |          68.9% |    435 |  56% |    56%  |       +8.5% |      -17.3%
  4 |            134 |          73.9% |    133 |  59% |    54%  |       +6.4% |      -13.5%
  5 |             34 |          67.6% |     33 |  48% |    45%  |      -12.9% |       +7.5%
@@ -74,26 +74,26 @@ Base : une équipe marque dans 74.2% des matchs
 ============================================================
 2) MODÈLE DE POISSON : paris à valeur (cotes moyennes réelles)
 ============================================================
-Référence (parier sur tout, cote ≤ 4.0) : ROI -4.8% sur 37537 paris  ← c&#x27;est la marge du bookmaker
+Référence (parier sur tout, cote ≤ 4.0) : ROI -4.8% sur 37542 paris  ← c&#x27;est la marge du bookmaker
 
  Avantage min | paris | % gagnés | ROI mise fixe
-      0%      | 13531 |   44.0%  | -6.7%
-      3%      | 11681 |   43.6%  | -6.9%
-      5%      | 10544 |   43.2%  | -7.0%
-     10%      |  8019 |   42.1%  | -7.5%
-     15%      |  5986 |   40.3%  | -8.8%
+      0%      | 13533 |   44.0%  | -6.6%
+      3%      | 11683 |   43.6%  | -6.9%
+      5%      | 10546 |   43.2%  | -7.0%
+     10%      |  8021 |   42.2%  | -7.4%
+     15%      |  5988 |   40.3%  | -8.7%
 
 Détail par pari à avantage ≥ 5% :
-   1          2098 paris   ROI -11.0%
+   1          2099 paris   ROI -10.8%
    2          2160 paris   ROI -5.8%
    N           572 paris   ROI -6.9%
-   Over2.5    2572 paris   ROI -5.0%
+   Over2.5    2573 paris   ROI -4.9%
    Under2.5   3142 paris   ROI -7.0%
 
 ============================================================
 3) SIMULATION : 10 € de départ, mise 5% du capital
 ============================================================
-10544 paris → capital final 0.00 €   (pire baisse depuis un sommet : 100%)
+10546 paris → capital final 0.00 €   (pire baisse depuis un sommet : 100%)
 
 ATTENTION : même un ROI positif ici n&#x27;est pas une garantie. Les bookmakers
 limitent les comptes gagnants et les cotes réelles bougent. Valide d&#x27;abord
